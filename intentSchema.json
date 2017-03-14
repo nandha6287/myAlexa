@@ -1,0 +1,16 @@
+{  
+  "intents": [  
+    { "intent": "authenticate", "slots": [{ "name": "userName", "type": "USER_ID" }, { "name": "secretPin", "type": "AMAZON.NUMBER" }] },  
+    { "intent": "openCart", "slots": [{ "name": "cartName", "type": "CART_NAME" }] },  
+    { "intent": "listCartItems", "slots": [{ "name": "cartName", "type": "CART_NAME" }] },  
+    { "intent": "addItemsToCart", "slots": [{ "name": "cartName", "type": "CART_NAME" }, { "name": "itemName", "type": "ITEM_NAME" }, { "name": "qty", "type": "AMAZON.NUMBER" }] },  
+	{ "intent": "removeItemsFromCart", "slots": [{ "name": "cartName", "type": "CART_NAME" }, { "name": "itemName", "type": "ITEM_NAME" }] },  
+	{ "intent": "checkOutItemsInCart", "slots": [{ "name": "cartName", "type": "CART_NAME" }] },
+    { "intent": "AMAZON.YesIntent", "slots": [] },  
+    { "intent": "AMAZON.NoIntent", "slots": [] },  
+    { "intent": "AMAZON.HelpIntent", "slots": [] }, 
+    { "intent": "AMAZON.StopIntent", "slots": [] },
+    { "intent": "AMAZON.CancelIntent", "slots": [] }, 
+    { "intent": "AMAZON.RepeatIntent", "slots": [] }
+  ]  
+}

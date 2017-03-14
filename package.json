@@ -1,0 +1,16 @@
+{
+  "name": "KNB Shopping Cart",
+  "version": "1.0.0",
+  "description": "Lambda function for Alexa",
+  "readme": "Lambda function for Alexa",
+  "repository": "myAlexa",
+  "main": "index.js",
+  "scripts": {
+      "zip": "zip -r ../index.zip . -x 'package.json' -x '*.git*' "
+  },
+  "author": "Nandha Rajan",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "alexa-sdk": "^1.0.7"
+  }
+}

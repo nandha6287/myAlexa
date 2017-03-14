@@ -1,0 +1,13 @@
+authenticate User ID is {userName} and secret pin is {secretPin}
+authenticate ID is {userName} and pin is {secretPin}
+authenticate {userName} {secretPin}
+openCart Open my cart {cartName}
+openCart Cart {cartName}
+listCartItems list items in cart {cartName}
+listCartItems list items in cart
+addItemsToCart add {qty} {itemName} to cart {cartName}
+addItemsToCart add {qty} {itemName}
+removeItemsFromCart remove {itemName} from cart {cartName}
+removeItemsFromCart remove {itemName}
+checkOutItemsInCart checkout {cartName}
+checkOutItemsInCart checkout
