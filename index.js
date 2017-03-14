@@ -45,7 +45,7 @@ var newSessionHandlers = {
 		this.handler.state = states.WLCMMODE;
 		
 		var userNameSlot = this.event.request.intent.slots.userName;
-		console.log(userNameSlot.value);
+		console.log(userNameSlot);
 		if (userNameSlot !== undefined)
 		{
 			userName = userNameSlot.value;
@@ -232,7 +232,7 @@ var transHandlers = Alexa.CreateStateHandler(states.TRANMODE, {
 		if (userSession)
 		{
 			var cartNameFromUser = this.event.request.intent.slots.cartName.value;
-			if (!cartNameFromUser === undefined)
+			if (cartNameFromUser !== undefined)
 			{
 				if (cartNameFromUser.trim().length()==0)
 				{
