@@ -14,6 +14,9 @@ var states = {
     TRANMODE: '_TRANMODE',
 	WLCMMODE: '_WLCMMODE',
 };
+var origIntent="";
+var userName = "";
+var secretPin = 0;
 var userSession = false;
 var cartCount = 0;
 var cartName = "MyCart";
@@ -27,33 +30,42 @@ var opsMsg="What would you like to do? You can add items, remove items, list the
 
 var newSessionHandlers = {
     'LaunchRequest': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
         this.handler.state = states.WLCMMODE;
         output = welcomeMessage + authMessage;
+
 		console.log(output);
         this.emit(':ask', output, welcomeRepromt + authMessage);
     },
     'authenticate': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
+		
 		this.handler.state = states.WLCMMODE;
-		var userName="";
+		
 		var userNameSlot = this.event.request.intent.slots.userName;
-		if (!userNameSlot === undefined)
+		console.log(userNameSlot.value);
+		if (userNameSlot !== undefined)
 		{
 			userName = userNameSlot.value;
+			console.log("user name set as "+userName);
 		}
-		else
+		/*else
 		{
-			userName = "nandha";
-		}
-		var secretPin = 0;
+			//request user to authenticate again
+			//userName = "nandha";
+		}*/
 		var secretPinSlot = this.event.request.intent.slots.secretPin;
-		if (!secretPinSlot === undefined)
+		if (secretPinSlot !== undefined)
 		{
-			secretPin = parseInt(secretPinSlot.value)
+			secretPin = parseInt(secretPinSlot.value);
+			console.log("secret pin set as "+secretPin);
 		}
-		else
+		/*else
 		{
 			secretPin = 123;
-		}
+		}*/
 		console.log(userName+secretPin);
 		authenticate(userName, secretPin);
 		if (userSession)
@@ -61,16 +73,29 @@ var newSessionHandlers = {
 			var respMsg = "";
 			if (cartCount==1)
 			{
-				respMsg = opsMsg;
+				if (origIntent.trim().length > 0)
+				{
+					console.log("origIntent"+origIntent);
+					this.handler.state = states.TRANMODE;
+					this.emitWithState(origIntent);
+					origIntent="";
+				}
+				else
+				{
+					respMsg = opsMsg;
+					console.log(respMsg);
+					this.handler.state = states.TRANMODE;
+					this.emit(':ask', respMsg, "Hello, "+respMsg);
+				}
+				
 			}
 			else
 			{
 				respMsg = "You have "+listItemsInArray(cartList)+". Which one should I open? ";
+				console.log(respMsg);
+				this.handler.state = states.TRANMODE;
+				this.emit(':ask', respMsg, "Hello, "+respMsg);
 			}
-			console.log(respMsg);
-			this.handler.state = states.TRANMODE;
-			this.emit(':ask', respMsg, "Hello, "+respMsg);
-			
 		}
 		else
 		{
@@ -79,6 +104,8 @@ var newSessionHandlers = {
 		}
     },
 	'openCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			this.handler.state = states.TRANMODE;
@@ -86,10 +113,13 @@ var newSessionHandlers = {
 		}
         else
 		{
+			origIntent="openCart";
 			this.emit('authenticate');
 		}
     },
 	'listCartItems': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			this.handler.state = states.TRANMODE;
@@ -97,10 +127,13 @@ var newSessionHandlers = {
 		}
         else
 		{
+			origIntent="listCartItems";
 			this.emit('authenticate');
 		}
     },
 	'addItemsToCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			this.handler.state = states.TRANMODE;
@@ -108,10 +141,13 @@ var newSessionHandlers = {
 		}
         else
 		{
+			origIntent="addItemsToCart";
 			this.emit('authenticate');
 		}
     },
 	'removeItemsFromCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			this.handler.state = states.TRANMODE;
@@ -119,10 +155,13 @@ var newSessionHandlers = {
 		}
         else
 		{
+			origIntent="removeItemsFromCart";
 			this.emit('authenticate');
 		}
     },
 	'checkOutItemsInCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			this.handler.state = states.TRANMODE;
@@ -130,6 +169,7 @@ var newSessionHandlers = {
 		}
         else
 		{
+			origIntent="checkOutItemsInCart";
 			this.emit('authenticate');
 		}
     },
@@ -154,10 +194,14 @@ var newSessionHandlers = {
 
 var transHandlers = Alexa.CreateStateHandler(states.TRANMODE, {
     'LaunchRequest': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
         output = "Hello "+dotSeparatedString(userName)+ " "+opsMsg;
         this.emit(':ask', output, output);
     },
     'authenticate': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (!userSession)
 		{
 			this.handler.state = states.WLCMMODE;
@@ -165,6 +209,8 @@ var transHandlers = Alexa.CreateStateHandler(states.TRANMODE, {
 		}
     },
 	'openCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			var cartName = this.event.request.intent.slots.cartName.value;
@@ -174,11 +220,15 @@ var transHandlers = Alexa.CreateStateHandler(states.TRANMODE, {
 		}
         else
 		{
+			console.log("No user session");
 			this.handler.state = states.WLCMMODE;
+			origIntent = "openCart";
 			this.emit('authenticate');
 		}
     },
 	'listCartItems': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			var cartNameFromUser = this.event.request.intent.slots.cartName.value;
@@ -196,15 +246,19 @@ var transHandlers = Alexa.CreateStateHandler(states.TRANMODE, {
 				console.log("list items in cart "+cartNameFromUser);
 				var itemsList = listCartItems(cartNameFromUser);
 				this.emit(':tell',itemsList);
-				this.emit(':ask', opsMsg, "Hello, "+opsMsg);
+				//this.emit(':ask', opsMsg, "Hello, "+opsMsg);
 		}
         else
 		{
+			console.log("No user session");
 			this.handler.state = states.WLCMMODE;
+			origIntent = "listCartItems";
 			this.emit('authenticate');
 		}
     },
 	'addItemsToCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			var itemName = this.event.request.intent.slots.itemName.value;
@@ -212,41 +266,51 @@ var transHandlers = Alexa.CreateStateHandler(states.TRANMODE, {
 			addItemToCart(itemName, qty);
 			console.log("add items "+itemName+" to cart "+cartName);
 			this.emit(':tell',"Add "+qty+" "+itemName + " to "+cartName);
-			this.emit(':ask', opsMsg, "Hello, "+opsMsg);
+			//this.emit(':ask', opsMsg, "Hello, "+opsMsg);
 		}
         else
 		{
+			console.log("No user session");
 			this.handler.state = states.WLCMMODE;
+			origIntent = "addItemsToCart";
 			this.emit('authenticate');
 		}
     },
 	'removeItemsFromCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			var itemName = this.event.request.intent.slots.itemName.value;
 			removeItemsInCart(itemName);
 			console.log("remove items "+itemName+" to cart "+cartName);
 			this.emit(':tell',"Removed "+itemName + " from "+cartName);
-			this.emit(':ask', opsMsg, "Hello, "+opsMsg);
+			//this.emit(':ask', opsMsg, "Hello, "+opsMsg);
 		}
         else
 		{
+			console.log("No user session");
 			this.handler.state = states.WLCMMODE;
+			origIntent = "removeItemsFromCart";
 			this.emit('authenticate');
 		}
     },
 	'checkOutItemsInCart': function () {
+		console.log(this.event.request.intent);
+		console.log(this.handler.state);
 		if (userSession)
 		{
 			checkOutCart(cartName);
 			console.log("checkout cart "+cartName);
 			this.emit(':tell',"Items in the cart are checked out. Payment and delivery details are sent your registered email address");
-			this.emit(':ask', opsMsg, "Hello, "+opsMsg);
+			//this.emit(':ask', opsMsg, "Hello, "+opsMsg);
 		}
         else
 		{
+			console.log("No user session");
 			this.handler.state = states.WLCMMODE;
-			this.emit('authenticate');
+			origIntent = "checkOutItemsInCart";
+			//this.emit('authenticate');
 		}
     },
     'AMAZON.StopIntent': function () {
@@ -271,24 +335,32 @@ var transHandlers = Alexa.CreateStateHandler(states.TRANMODE, {
 function authenticate(userName, secretPin)
 {
 	//REST API call to KNB Service
-	userSession = true;
-	
+	if (userName=="nandha" && secretPin== 123)
+	{
+		userSession = true;
+		console.log("Authentication successfull");
+	}
+	else
+	{
+		console.log("Authentication failed for "+userName);
+	}
 	//REST Call to get Cart Details
 	if (userSession)
 	{
 		//REST Call here to get cart count
 		cartCount = 1;
+		if (cartCount==1)
+		{
+			loadCart("MyCart");
+		}
+		else
+		{
+			//REST Call to get 
+			var cartList= listCarts(userName);
+			cartCount = Object.keys(cartList).length
+		}
 	}
-	if (cartCount==1)
-	{
-		loadCart("MyCart");
-	}
-	else
-	{
-		//REST Call to get 
-		var cartList= listCarts(userName);
-		cartCount = Object.keys(cartList).length
-	}
+	
 }
 function loadCart(cartName)
 {
@@ -297,7 +369,7 @@ function loadCart(cartName)
 function listCarts(userName)
 {
 	//Rest Call to get the list of carts the user owns
-	var cartList = ["MyCart", "DiwaliCart"];
+	var cartList = ["My Cart", "Diwali Cart"];
 	return cartList;
 }
 function listCartItems(cartName)

@@ -1,4 +1,5 @@
 authenticate User ID is {userName} and secret pin is {secretPin}
+authenticate User ID for KNB is {userName} and secret pin is {secretPin}
 authenticate ID is {userName} and pin is {secretPin}
 authenticate {userName} {secretPin}
 openCart Open my cart {cartName}
